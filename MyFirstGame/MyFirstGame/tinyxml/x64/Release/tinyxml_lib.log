@@ -1,0 +1,20 @@
+﻿Build started 14.3.2015 21:03:42.
+     1>Project "I:\Files\C++\MyFirstGame\MyFirstGame\tinyxml\tinyxml_lib.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Ob1 /D WIN32 /D NDEBUG /D _LIB /D _VC80_UPGRADE=0x0600 /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt tinystr.cpp tinyxml.cpp tinyxmlerror.cpp tinyxmlparser.cpp
+         tinystr.cpp
+         tinyxml.cpp
+         tinyxmlerror.cpp
+         tinyxmlparser.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\Lib.exe /OUT:"I:\Files\C++\MyFirstGame\MyFirstGame\tinyxml\x64\Release\tinyxml.lib" /NOLOGO /MACHINE:X64 x64\Release\tinystr.obj
+         x64\Release\tinyxml.obj
+         x64\Release\tinyxmlerror.obj
+         x64\Release\tinyxmlparser.obj
+         tinyxml_lib.vcxproj -> I:\Files\C++\MyFirstGame\MyFirstGame\tinyxml\x64\Release\tinyxml.lib
+     1>Done Building Project "I:\Files\C++\MyFirstGame\MyFirstGame\tinyxml\tinyxml_lib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.07

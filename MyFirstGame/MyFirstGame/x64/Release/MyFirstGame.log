@@ -1,0 +1,25 @@
+﻿Build started 22.3.2015 20:26:30.
+     1>Project "I:\Files\C++\MyFirstGame\MyFirstGame\MyFirstGame.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"I:\Files\C++\MyFirstGame\x64\Release\MyFirstGame.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:I:\Files\C++\MyFirstGame\libs /LIBPATH:I:\Files\C++\MyFirstGame\MyFirstGame\tinyxml\lib "sfml-graphics.lib" "sfml-window.lib" "sfml-system.lib" "tinyxml-d.lib" Box2D.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"I:\Files\C++\MyFirstGame\x64\Release\MyFirstGame.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"I:\Files\C++\MyFirstGame\x64\Release\MyFirstGame.lib" /MACHINE:X64 x64\Release\AnimatedSprite.obj
+         x64\Release\Animation.obj
+         x64\Release\Level.obj
+         x64\Release\main.obj
+     1>LINK : warning LNK4098: defaultlib 'LIBCMTD' conflicts with use of other libs; use /NODEFAULTLIB:library
+     1>main.obj : error LNK2001: unresolved external symbol "public: class b2Body * __cdecl b2World::CreateBody(struct b2BodyDef const *)" (?CreateBody@b2World@@QEAAPEAVb2Body@@PEBUb2BodyDef@@@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: __cdecl b2World::~b2World(void)" (??1b2World@@QEAA@XZ)
+     1>main.obj : error LNK2001: unresolved external symbol "public: __cdecl b2World::b2World(struct b2Vec2 const &)" (??0b2World@@QEAA@AEBUb2Vec2@@@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: class b2Fixture * __cdecl b2Body::CreateFixture(class b2Shape const *,float)" (?CreateFixture@b2Body@@QEAAPEAVb2Fixture@@PEBVb2Shape@@M@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl b2PolygonShape::ComputeMass(struct b2MassData *,float)const " (?ComputeMass@b2PolygonShape@@UEBAXPEAUb2MassData@@M@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl b2PolygonShape::ComputeAABB(struct b2AABB *,struct b2Transform const &,int)const " (?ComputeAABB@b2PolygonShape@@UEBAXPEAUb2AABB@@AEBUb2Transform@@H@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual bool __cdecl b2PolygonShape::RayCast(struct b2RayCastOutput *,struct b2RayCastInput const &,struct b2Transform const &,int)const " (?RayCast@b2PolygonShape@@UEBA_NPEAUb2RayCastOutput@@AEBUb2RayCastInput@@AEBUb2Transform@@H@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual bool __cdecl b2PolygonShape::TestPoint(struct b2Transform const &,struct b2Vec2 const &)const " (?TestPoint@b2PolygonShape@@UEBA_NAEBUb2Transform@@AEBUb2Vec2@@@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: void __cdecl b2PolygonShape::SetAsBox(float,float)" (?SetAsBox@b2PolygonShape@@QEAAXMM@Z)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual int __cdecl b2PolygonShape::GetChildCount(void)const " (?GetChildCount@b2PolygonShape@@UEBAHXZ)
+     1>main.obj : error LNK2001: unresolved external symbol "public: virtual class b2Shape * __cdecl b2PolygonShape::Clone(class b2BlockAllocator *)const " (?Clone@b2PolygonShape@@UEBAPEAVb2Shape@@PEAVb2BlockAllocator@@@Z)
+     1>I:\Files\C++\MyFirstGame\x64\Release\MyFirstGame.exe : fatal error LNK1120: 11 unresolved externals
+     1>Done Building Project "I:\Files\C++\MyFirstGame\MyFirstGame\MyFirstGame.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.34
