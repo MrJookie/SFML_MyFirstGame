@@ -1,7 +1,5 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
-//#include <Box2D/Box2D.h>
-#include "AnimatedSprite.h"
 #include "Level.h"
 #include "Player.h"
 
@@ -47,40 +45,48 @@ void movePlayer(sf::Sprite& player, const std::vector<Object>& collisionObjects,
 
 int main()
 {
+	std::cout << "Level is loading" << std::endl;
+
 	enum Direction { Down, Left, Right, Up };
 
 	sf::Vector2i source(1, 0);
 	float frameCounter = 0, switchFrame = 80, frameSpeed = 500;
-
-	sf::Vector2f screenDimensions(1024, 768);
-	sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "First app", sf::Style::Titlebar | sf::Style::Close);
-	window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(60);
-	window.setKeyRepeatEnabled(false);
 
 	Level level;
 	sf::Texture playerTexture;
 	sf::Sprite playerSprite;
 	sf::Clock clock;
 
-	if (!level.loadFromFile("I:\\Files\\C++\\MyFirstGame\\x64\\Debug\\map.tmx"))
+	if (!level.loadFromFile("C:\\Users\\admin\\Desktop\\SFML_MyFirstGame\\MyFirstGame\\x64\\Debug\\map.tmx"))
 	{
 		std::cout << "Failed to load tile map!" << std::endl;
 		return -1;
 	}
 
-	if (!playerTexture.loadFromFile("I:\\Files\\C++\\MyFirstGame\\x64\\Debug\\player.png"))
+	std::cout << "Level has been loaded" << std::endl;
+
+	if (!playerTexture.loadFromFile("C:\\Users\\admin\\Desktop\\SFML_MyFirstGame\\MyFirstGame\\x64\\Debug\\player.png"))
 	{
 		std::cout << "Failed to load player spritesheet!" << std::endl;
 		return -1;
 	}
 
+	std::vector<Object> collisionObjects = level.getAllObjects();
+
+	std::cout << "Setting up window" << std::endl;
+
 	playerSprite.setTexture(playerTexture);
-	playerSprite.setPosition(screenDimensions.x / 2, screenDimensions.y / 2);
+	playerSprite.setPosition(100, 100);
+
+	sf::Vector2f screenDimensions(800, 600);
+	sf::RenderWindow window(sf::VideoMode(screenDimensions.x, screenDimensions.y), "First app", sf::Style::Titlebar | sf::Style::Close);
+	//window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(60);
+	window.setKeyRepeatEnabled(false);
+
+	std::cout << "Preparing to launch" << std::endl;
 
 	sf::View cam(sf::FloatRect(0, 0, screenDimensions.x, screenDimensions.y));
-
-	std::vector<Object> collisionObjects = level.getAllObjects();
 
 	while (window.isOpen())
 	{

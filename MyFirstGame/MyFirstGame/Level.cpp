@@ -1,44 +1,44 @@
+#include <fstream>
+#include <iostream>
+#include "RapidXML/rapidxml.hpp"
 #include "level.h"
 
-#include <iostream>
-#include "tinyxml.h"
+using namespace rapidxml;
 
 bool Level::loadFromFile(std::string filename)
 {
-	TiXmlDocument levelFile(filename.c_str());
+	std::ifstream myfile(filename);
+	rapidxml::xml_document<> doc;
+	std::vector<char> buffer((std::istreambuf_iterator<char>(myfile)), std::istreambuf_iterator<char>());
+	//buffer.push_back('\0');
 
-	if (!levelFile.LoadFile())
-	{
-		std::cout << "Loading level \"" << filename << "\" failed." << std::endl;
-		return false;
-	}
+	doc.parse<0>(&buffer[0]);
 
-	TiXmlElement *map;
-	map = levelFile.FirstChildElement("map");
+	xml_node<>* map;
+	map = doc.first_node("map");
 
-	width = atoi(map->Attribute("width"));
-	height = atoi(map->Attribute("height"));
-	tileWidth = atoi(map->Attribute("tilewidth"));
-	tileHeight = atoi(map->Attribute("tileheight"));
+	width = atoi(map->first_attribute("width")->value());
+	height = atoi(map->first_attribute("height")->value());
+	tileWidth = atoi(map->first_attribute("tilewidth")->value());
+	tileHeight = atoi(map->first_attribute("tileheight")->value());
 
-	TiXmlElement *tilesetElement;
-	tilesetElement = map->FirstChildElement("tileset");
-	firstTileID = atoi(tilesetElement->Attribute("firstgid"));
+	xml_node<>* tilesetElement;
+	tilesetElement = map->first_node("tileset");
+	firstTileID = atoi(tilesetElement->first_attribute("firstgid")->value());
 
-	TiXmlElement *image;
-	image = tilesetElement->FirstChildElement("image");
-	std::string imagepath = image->Attribute("source");
+	xml_node<>* image;
+	image = tilesetElement->first_node("image");
+	std::string tilesheetImagePath = image->first_attribute("source")->value();
 
-	sf::Image img;
-
-	if (!img.loadFromFile(imagepath))
+	sf::Image tilesheetImage;
+	if (!tilesheetImage.loadFromFile(tilesheetImagePath))
 	{
 		std::cout << "Failed to load tile sheet." << std::endl;
 		return false;
 	}
 
-	img.createMaskFromColor(sf::Color(109, 159, 185));
-	tilesetImage.loadFromImage(img);
+	tilesheetImage.createMaskFromColor(sf::Color(109, 159, 185));
+	tilesetImage.loadFromImage(tilesheetImage);
 	tilesetImage.setSmooth(false);
 
 	int columns = tilesetImage.getSize().x / tileWidth;
@@ -61,34 +61,27 @@ bool Level::loadFromFile(std::string filename)
 		}
 	}
 
-	TiXmlElement *layerElement;
-	layerElement = map->FirstChildElement("layer");
+	xml_node<>* layerElement;
+	layerElement = map->first_node("layer");
 	while (layerElement)
 	{
 		Layer layer;
-
-		if (layerElement->Attribute("opacity") != NULL)
-		{
-			float opacity = strtod(layerElement->Attribute("opacity"), NULL);
-			layer.opacity = 255 * opacity;
-		}
+		if (layerElement->first_attribute("opacity"))
+			layer.opacity = 255 * strtod(layerElement->first_attribute("opacity")->value(), 0);
 		else
-		{
 			layer.opacity = 255;
-		}
 
-		TiXmlElement *layerDataElement;
-		layerDataElement = layerElement->FirstChildElement("data");
-
-		if (layerDataElement == NULL)
+		xml_node<>* layerDataElement;
+		layerDataElement = layerElement->first_node("data");
+		if (!layerDataElement)
 		{
 			std::cout << "Bad map. No layer information found." << std::endl;
+			return false;
 		}
 
-		TiXmlElement *tileElement;
-		tileElement = layerDataElement->FirstChildElement("tile");
-
-		if (tileElement == NULL)
+		xml_node<>* tileElement;
+		tileElement = layerDataElement->first_node("tile");
+		if (!tileElement)
 		{
 			std::cout << "Bad map. No tile information found." << std::endl;
 			return false;
@@ -99,7 +92,7 @@ bool Level::loadFromFile(std::string filename)
 
 		while (tileElement)
 		{
-			int tileGID = atoi(tileElement->Attribute("gid"));
+			int tileGID = atoi(tileElement->first_attribute("gid")->value());
 			int subRectToUse = tileGID - firstTileID;
 
 			if (subRectToUse >= 0)
@@ -113,7 +106,7 @@ bool Level::loadFromFile(std::string filename)
 				layer.tiles.push_back(sprite);
 			}
 
-			tileElement = tileElement->NextSiblingElement("tile");
+			tileElement = tileElement->next_sibling("tile");
 
 			x++;
 			if (x >= width)
@@ -127,33 +120,29 @@ bool Level::loadFromFile(std::string filename)
 
 		layers.push_back(layer);
 
-		layerElement = layerElement->NextSiblingElement("layer");
+		layerElement = layerElement->next_sibling("layer");
 	}
 
-	TiXmlElement *objectGroupElement;
-
-	if (map->FirstChildElement("objectgroup") != NULL)
+	xml_node<>* objectGroupElement;
+	if (map->first_node("objectgroup"))
 	{
-		objectGroupElement = map->FirstChildElement("objectgroup");
+		objectGroupElement = map->first_node("objectgroup");
 		while (objectGroupElement)
 		{
-			TiXmlElement *objectElement;
-			objectElement = objectGroupElement->FirstChildElement("object");
-
+			xml_node<>* objectElement;
+			objectElement = objectGroupElement->first_node("object");
 			while (objectElement)
 			{
 				std::string objectType;
-				if (objectElement->Attribute("type") != NULL)
-				{
-					objectType = objectElement->Attribute("type");
-				}
+				if (objectElement->first_attribute("type"))
+					objectType = objectElement->first_attribute("type")->value();
+
 				std::string objectName;
-				if (objectElement->Attribute("name") != NULL)
-				{
-					objectName = objectElement->Attribute("name");
-				}
-				float x = atof(objectElement->Attribute("x"));
-				float y = atof(objectElement->Attribute("y"));
+				if (objectElement->first_attribute("name"))
+					objectName = objectElement->first_attribute("name")->value();
+
+				float x = atof(objectElement->first_attribute("x")->value());
+				float y = atof(objectElement->first_attribute("y")->value());
 
 				int width, height;
 
@@ -162,20 +151,18 @@ bool Level::loadFromFile(std::string filename)
 				sprite.setTextureRect(sf::Rect<int>(0, 0, 0, 0));
 				sprite.setPosition(x, y);
 
-				if (objectElement->Attribute("width") != NULL)
+				if (objectElement->first_attribute("width"))
 				{
-					width = atoi(objectElement->Attribute("width"));
-					height = atoi(objectElement->Attribute("height"));
+					width = atoi(objectElement->first_attribute("width")->value());
+					height = atoi(objectElement->first_attribute("height")->value());
 					sprite.setTextureRect(sf::Rect<int>(-1000, -1000, width, height));
 					sprite.setColor(sf::Color(255, 255, 255, 0));
-					std::cout << "1. " << objectName << std::endl;
 				}
 				else
 				{
-					width = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].width;
-					height = subRects[atoi(objectElement->Attribute("gid")) - firstTileID].height;
-					sprite.setTextureRect(subRects[atoi(objectElement->Attribute("gid")) - firstTileID]);
-					std::cout << "2. " << objectName << std::endl;
+					width = subRects[atoi(objectElement->first_attribute("gid")->value()) - firstTileID].width;
+					height = subRects[atoi(objectElement->first_attribute("gid")->value()) - firstTileID].height;
+					sprite.setTextureRect(subRects[atoi(objectElement->first_attribute("gid")->value()) - firstTileID]);
 				}
 
 				Object object;
@@ -190,36 +177,38 @@ bool Level::loadFromFile(std::string filename)
 				objectRect.width = width;
 				object.rect = objectRect;
 
-				TiXmlElement *properties;
-				properties = objectElement->FirstChildElement("properties");
-				if (properties != NULL)
+				xml_node<>* properties;
+				properties = objectElement->first_node("properties");
+				if (properties)
 				{
-					TiXmlElement *prop;
-					prop = properties->FirstChildElement("property");
-					if (prop != NULL)
+					xml_node<>* property;
+					property = properties->first_node("property");
+					if (property)
 					{
-						while (prop)
+						while (property)
 						{
-							std::string propertyName = prop->Attribute("name");
-							std::string propertyValue = prop->Attribute("value");
+							std::string propertyName = property->first_attribute("name")->value();
+							std::string propertyValue = property->first_attribute("value")->value();
 
 							object.properties[propertyName] = propertyValue;
 
-							prop = prop->NextSiblingElement("property");
+							property = property->next_sibling("property");
 						}
 					}
 				}
 
 				objects.push_back(object);
 
-				objectElement = objectElement->NextSiblingElement("object");
+				objectElement = objectElement->next_sibling("object");
 			}
-			objectGroupElement = objectGroupElement->NextSiblingElement("objectgroup");
+
+			objectGroupElement = objectGroupElement->next_sibling("objectgroup");
 		}
 	}
 	else
 	{
 		std::cout << "No object layers found..." << std::endl;
+		return false;
 	}
 
 	return true;
@@ -239,9 +228,8 @@ std::vector<Object> Level::getObjects(std::string name)
 std::vector<Object> Level::getAllObjects()
 {
 	std::vector<Object> vec;
-	for (int i = 0; i < objects.size(); ++i) {
+	for (int i = 0; i < objects.size(); ++i)
 		vec.push_back(objects[i]);
-	}
 
 	return vec;
 }
