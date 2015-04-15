@@ -1,6 +1,3 @@
-#include <fstream>
-#include <iostream>
-#include "RapidXML/rapidxml.hpp"
 #include "level.h"
 
 using namespace rapidxml;
@@ -8,9 +5,15 @@ using namespace rapidxml;
 bool Level::loadFromFile(std::string filename)
 {
 	std::ifstream myfile(filename);
+	if (!myfile)
+	{
+		std::cout << "Failed to load tile map!" << std::endl;
+		return false;
+	}
+
 	rapidxml::xml_document<> doc;
 	std::vector<char> buffer((std::istreambuf_iterator<char>(myfile)), std::istreambuf_iterator<char>());
-	//buffer.push_back('\0');
+	buffer.push_back('\0');
 
 	doc.parse<0>(&buffer[0]);
 
@@ -21,6 +24,9 @@ bool Level::loadFromFile(std::string filename)
 	height = atoi(map->first_attribute("height")->value());
 	tileWidth = atoi(map->first_attribute("tilewidth")->value());
 	tileHeight = atoi(map->first_attribute("tileheight")->value());
+
+	std::cout << "map width: " << width << std::endl;
+	std::cout << "map height: " << height << std::endl;
 
 	xml_node<>* tilesetElement;
 	tilesetElement = map->first_node("tileset");
@@ -75,7 +81,7 @@ bool Level::loadFromFile(std::string filename)
 		layerDataElement = layerElement->first_node("data");
 		if (!layerDataElement)
 		{
-			std::cout << "Bad map. No layer information found." << std::endl;
+			std::cout << "Corrupted map file. No layer information found." << std::endl;
 			return false;
 		}
 
@@ -83,12 +89,17 @@ bool Level::loadFromFile(std::string filename)
 		tileElement = layerDataElement->first_node("tile");
 		if (!tileElement)
 		{
-			std::cout << "Bad map. No tile information found." << std::endl;
+			std::cout << "Corrupted map file. No tile information found." << std::endl;
 			return false;
 		}
 
 		int x = 0;
 		int y = 0;
+
+		//resize 2D tile array
+		layer.tiles.resize(width);
+		for (int i = 0; i < height; ++i)
+			layer.tiles[i].resize(height);
 
 		while (tileElement)
 		{
@@ -103,10 +114,19 @@ bool Level::loadFromFile(std::string filename)
 				sprite.setPosition(x * tileWidth, y * tileHeight);
 				sprite.setColor(sf::Color(255, 255, 255, layer.opacity));
 
-				layer.tiles.push_back(sprite);
+				layer.tiles[x][y] = sprite;
 			}
+			/*
+			//very bad prevention - before was used in 1D tile array, not needed in 2D vector anymore
+			else {
+				sf::Sprite sprite;
+				sprite.setPosition(x * tileWidth, y * tileHeight);
+				sprite.setColor(sf::Color(255, 255, 255, 0));
 
-			tileElement = tileElement->next_sibling("tile");
+				//layer.tiles.push_back(sprite);
+				layer.tiles[x][y] = sprite;
+			}
+			*/
 
 			x++;
 			if (x >= width)
@@ -116,10 +136,11 @@ bool Level::loadFromFile(std::string filename)
 				if (y >= height)
 					y = 0;
 			}
+
+			tileElement = tileElement->next_sibling("tile");
 		}
 
 		layers.push_back(layer);
-
 		layerElement = layerElement->next_sibling("layer");
 	}
 
@@ -204,6 +225,8 @@ bool Level::loadFromFile(std::string filename)
 
 			objectGroupElement = objectGroupElement->next_sibling("objectgroup");
 		}
+
+		std::cout << "Loaded objects: " << objects.size() << std::endl;
 	}
 	else
 	{
@@ -239,13 +262,56 @@ sf::Vector2i Level::getTileSize()
 	return sf::Vector2i(tileWidth, tileHeight);
 }
 
-void Level::draw(sf::RenderWindow& window)
+void Level::updateAnimationTile(int tileGID)
 {
+	
+
+}
+
+void Level::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	//target.draw();
+}
+
+void Level::draw(sf::RenderWindow& window, int playerPosToTileX, int playerPosToTileY)
+{
+	int leftTileX = playerPosToTileX - window.getSize().x / 32;
+	int rightTileX = playerPosToTileX + window.getSize().x / 32;
+	int topTileY = playerPosToTileY - window.getSize().y / 32;
+	int bottomTileY = playerPosToTileY + window.getSize().y / 32;
+
+	if (leftTileX < 0)
+		leftTileX = 0;
+	else if (leftTileX > 256)
+		leftTileX = 256;
+
+	if (rightTileX < 0)
+		rightTileX = 0;
+	else if (rightTileX > 255)
+		rightTileX = 255;
+
+	if (topTileY < 0)
+		topTileY = 0;
+	else if (topTileY > 255)
+		topTileY = 255;
+
+	if (bottomTileY < 0)
+		bottomTileY = 0;
+	else if (bottomTileY > 255)
+		bottomTileY = 255;
+
+	/*
+	std::cout << "leftTileX: " << leftTileX << " topTileY: " << topTileY << std::endl;
+	std::cout << "rightTileX: " << rightTileX << " bottomTileY: " << bottomTileY << std::endl;
+	*/
+
 	for (int layer = 0; layer < layers.size(); ++layer)
 	{
-		for (int tile = 0; tile < layers[layer].tiles.size(); ++tile)
+		for (int x = leftTileX; x < rightTileX; ++x)
 		{
-			window.draw(layers[layer].tiles[tile]);
+			for (int y = topTileY; y < bottomTileY; ++y)
+			{
+				window.draw(layers[layer].tiles[x][y]);
+			}
 		}
 	}
 }

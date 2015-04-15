@@ -1,10 +1,12 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <map>
 #include <SFML/Graphics.hpp>
+#include "RapidXML/rapidxml.hpp"
 
 class Object
 {
@@ -21,7 +23,7 @@ class Layer
 {
 public:
 	int opacity;
-	std::vector<sf::Sprite> tiles;
+	std::vector<std::vector<sf::Sprite>> tiles;
 };
 
 class Level
@@ -30,8 +32,9 @@ public:
 	bool loadFromFile(std::string filename);
 	std::vector<Object> getObjects(std::string name);
 	std::vector<Object> getAllObjects();
-	void draw(sf::RenderWindow &window);
+	void draw(sf::RenderWindow &window, int playerPosToTileX, int playerPosToTileY);
 	sf::Vector2i getTileSize();
+	void Level::updateAnimationTile(int tileGID);
 
 private:
 	int width, height, tileWidth, tileHeight;
@@ -40,6 +43,7 @@ private:
 	sf::Texture tilesetImage;
 	std::vector<Object> objects;
 	std::vector<Layer> layers;
+	virtual void Level::draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 
 #endif
