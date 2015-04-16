@@ -2,6 +2,18 @@
 
 using namespace rapidxml;
 
+Level::Level()
+{
+	if (!loadFromFile("map.tmx"))
+	{
+		std::cout << "Failed to load tile map!" << std::endl;
+	}
+}
+
+Level::~Level()
+{
+}
+
 bool Level::loadFromFile(std::string filename)
 {
 	std::ifstream myfile(filename);
@@ -264,54 +276,5 @@ sf::Vector2i Level::getTileSize()
 
 void Level::updateAnimationTile(int tileGID)
 {
-	
 
-}
-
-void Level::draw(sf::RenderTarget& target, sf::RenderStates states) const {
-	//target.draw();
-}
-
-void Level::draw(sf::RenderWindow& window, int playerPosToTileX, int playerPosToTileY)
-{
-	int leftTileX = playerPosToTileX - window.getSize().x / 32;
-	int rightTileX = playerPosToTileX + window.getSize().x / 32;
-	int topTileY = playerPosToTileY - window.getSize().y / 32;
-	int bottomTileY = playerPosToTileY + window.getSize().y / 32;
-
-	if (leftTileX < 0)
-		leftTileX = 0;
-	else if (leftTileX > 256)
-		leftTileX = 256;
-
-	if (rightTileX < 0)
-		rightTileX = 0;
-	else if (rightTileX > 255)
-		rightTileX = 255;
-
-	if (topTileY < 0)
-		topTileY = 0;
-	else if (topTileY > 255)
-		topTileY = 255;
-
-	if (bottomTileY < 0)
-		bottomTileY = 0;
-	else if (bottomTileY > 255)
-		bottomTileY = 255;
-
-	/*
-	std::cout << "leftTileX: " << leftTileX << " topTileY: " << topTileY << std::endl;
-	std::cout << "rightTileX: " << rightTileX << " bottomTileY: " << bottomTileY << std::endl;
-	*/
-
-	for (int layer = 0; layer < layers.size(); ++layer)
-	{
-		for (int x = leftTileX; x < rightTileX; ++x)
-		{
-			for (int y = topTileY; y < bottomTileY; ++y)
-			{
-				window.draw(layers[layer].tiles[x][y]);
-			}
-		}
-	}
 }

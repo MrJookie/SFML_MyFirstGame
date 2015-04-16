@@ -29,6 +29,11 @@ public:
 class Level
 {
 public:
+	Level();
+	Level(Level& value);
+	Level operator=(Level& value);
+	~Level();
+
 	bool loadFromFile(std::string filename);
 	std::vector<Object> getObjects(std::string name);
 	std::vector<Object> getAllObjects();
@@ -36,14 +41,15 @@ public:
 	sf::Vector2i getTileSize();
 	void Level::updateAnimationTile(int tileGID);
 
+protected:
+	std::vector<Object> objects;
+	std::vector<Layer> layers;
+
 private:
 	int width, height, tileWidth, tileHeight;
 	int firstTileID;
 	sf::Rect<float> drawingBounds;
 	sf::Texture tilesetImage;
-	std::vector<Object> objects;
-	std::vector<Layer> layers;
-	virtual void Level::draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
 
 #endif

@@ -7,23 +7,31 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "Level.h"
+#include "Player.h"
 
-class Game : public sf::Transformable, public sf::Drawable
+class Game : public Level, public Player, public sf::Transformable, public sf::Drawable
 {
 public:
 	Game();
 	Game(Game& value);
-	//Player operator=(Player& value);
+	Game(sf::Vector2f screenDimension);
+	//Game operator=(Game& value);
 	~Game();
-	void setCollisionObject(std::vector<Object> collisionObjects);
 
-protected:
-	std::vector<Object> collisionObjects;
+	void movePlayer(int moveDirection);
+	sf::Vector2f getScreenDimension();
+	sf::Vector2f getPlayerCamPosition();
+	void update();
+	void setView();
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
-	sf::View cam;
-
-	virtual void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const;
+	sf::Vector2f camPosition;
+	sf::Vector2f screenDimension;
+	sf::View playerView;
+	
+	void updatePlayerCam();
+	bool moveIsColliding(sf::FloatRect playerRect);
 };
 
 #endif
