@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -18,19 +17,35 @@ public:
 	//Game operator=(Game& value);
 	~Game();
 
-	void movePlayer(int moveDirection);
 	sf::Vector2f getScreenDimension();
 	sf::Vector2f getPlayerCamPosition();
+	void setMouseCoords(int x, int y);
+	void movePlayer(int moveDirection);
 	void update();
-	void setView();
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
+	int leftTileX, rightTileX, topTileY, bottomTileY;
+	int FPS;
+	int currentFlowerTile;
+	sf::Time time;
+	sf::Clock fpsClock;
+	sf::Clock updateFpsClock;
+	sf::Clock flowerAnimationClock;
 	sf::Vector2f camPosition;
 	sf::Vector2f screenDimension;
+	sf::Vector2i mousePosition;
 	sf::View playerView;
-	
+	sf::View HUD;
+	sf::Text FPSText;
+	sf::Font font;
+	void initHUD();
+	void setView();
+	void calculateFPS();
+	void updateHUD();
 	void updatePlayerCam();
+	void updateAnimatedFlowers();
+	void setDrawingBounds();
 	bool moveIsColliding(sf::FloatRect playerRect);
 };
 

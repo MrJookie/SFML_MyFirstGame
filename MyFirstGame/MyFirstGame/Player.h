@@ -12,11 +12,10 @@ public:
 protected:
 	sf::Sprite pSprite;
 	sf::Texture pTexture;
-	//sf::Sprite pSprite;
 	sf::Vector2f pPosition;
 	float frameCounter = 0, switchFrame = 80, frameSpeed = 500;
 	sf::Vector2i source;
-	sf::Clock clock;
+	sf::Clock playerAnimationClock;
 };
 
 #endif

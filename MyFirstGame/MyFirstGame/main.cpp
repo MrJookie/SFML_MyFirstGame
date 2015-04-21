@@ -1,4 +1,3 @@
-#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "Game.h"
 #include "Level.h"
@@ -8,35 +7,24 @@ int main()
 {
 	std::cout << "Level is loading" << std::endl;
 
-	sf::Vector2f screenDimension(1024, 768);
+	sf::Vector2f screenDimension(800, 600);
 
 	sf::RenderWindow window(
-		sf::VideoMode(screenDimension.x, screenDimension.y),
-		"First app",
+		sf::VideoMode(static_cast<int>(screenDimension.x), static_cast<int>(screenDimension.y)),
+		"MyFirstGame",
 		sf::Style::Titlebar | sf::Style::Close
 	);
+
+	//window.setMouseCursorVisible(false);
+	//window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(60);
+	window.setKeyRepeatEnabled(false);
 
 	Game game(screenDimension);
 	Player player;
 
-	//window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(200);
-	window.setKeyRepeatEnabled(false);
-
-	sf::View HUD;
-
-	sf::Text FPSText;
-	sf::Font font;
-	if (!font.loadFromFile("arial.ttf"))
-		return -1;
-	FPSText.setFont(font);
-	FPSText.setString("Text");
-
 	while (window.isOpen())
 	{
-		//sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
-		//std::cout << "pixelPos x: " << pixelPos.x << " pixelPos y: " << pixelPos.y << std::endl;
-
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
@@ -46,8 +34,7 @@ int main()
 				window.close();
 			if (event.type == sf::Event::MouseMoved)
 			{
-				//std::cout << "new mouse x: " << event.mouseMove.x << std::endl;
-				//std::cout << "new mouse y: " << event.mouseMove.y << std::endl;
+				game.setMouseCoords(event.mouseMove.x, event.mouseMove.y);
 			}
 		}
 
@@ -64,13 +51,10 @@ int main()
 			game.movePlayer(1);
 		}
 
+		game.update();
+
 		window.clear();
-
 		window.draw(game);
-
-		window.setView(HUD);
-		window.draw(FPSText);
-
 		window.display();
 	}
 

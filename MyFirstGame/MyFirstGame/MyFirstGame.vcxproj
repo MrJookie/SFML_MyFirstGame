@@ -154,17 +154,9 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="main2.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimatedSprite.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Player.h" />

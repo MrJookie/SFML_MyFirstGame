@@ -1,4 +1,5 @@
-#include "level.h"
+#include <iostream>
+#include "Level.h"
 
 using namespace rapidxml;
 
@@ -61,8 +62,6 @@ bool Level::loadFromFile(std::string filename)
 
 	int columns = tilesetImage.getSize().x / tileWidth;
 	int rows = tilesetImage.getSize().y / tileHeight;
-
-	std::vector<sf::Rect<int>> subRects;
 
 	for (int y = 0; y < rows; ++y)
 	{
@@ -269,7 +268,18 @@ std::vector<Object> Level::getAllObjects()
 	return vec;
 }
 
-sf::Vector2i Level::getTileSize()
+sf::Vector2i Level::getMapSizeTiles() const
+{
+	return sf::Vector2i(width, height);
+}
+
+sf::Vector2i Level::getMapSizePixels()
+{
+	return sf::Vector2i(width * tileWidth, height * tileHeight);
+}
+
+
+sf::Vector2i Level::getTileSize() const
 {
 	return sf::Vector2i(tileWidth, tileHeight);
 }

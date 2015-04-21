@@ -24,9 +24,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,9 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimatedSprite.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Source Files</Filter>
     </ClInclude>

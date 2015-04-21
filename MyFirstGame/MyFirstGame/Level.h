@@ -2,7 +2,6 @@
 #define LEVEL_H
 
 #include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
@@ -38,10 +37,13 @@ public:
 	std::vector<Object> getObjects(std::string name);
 	std::vector<Object> getAllObjects();
 	void draw(sf::RenderWindow &window, int playerPosToTileX, int playerPosToTileY);
-	sf::Vector2i getTileSize();
-	void Level::updateAnimationTile(int tileGID);
+	sf::Vector2i getMapSizeTiles() const;
+	sf::Vector2i getMapSizePixels();
+	sf::Vector2i getTileSize() const;
+	void updateAnimationTile(int tileGID);
 
 protected:
+	std::vector<sf::Rect<int>> subRects;
 	std::vector<Object> objects;
 	std::vector<Layer> layers;
 
