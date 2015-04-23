@@ -27,26 +27,28 @@ public:
 private:
 	int leftTileX, rightTileX, topTileY, bottomTileY;
 	int FPS;
-	int currentFlowerTile;
+	int currentFlowersTile, currentCoinsTile;
 	sf::Time time;
 	sf::Clock fpsClock;
 	sf::Clock updateFpsClock;
-	sf::Clock flowerAnimationClock;
+	sf::Clock flowersAnimationClock;
+	sf::Clock coinsAnimationClock;
 	sf::Vector2f camPosition;
 	sf::Vector2f screenDimension;
 	sf::Vector2i mousePosition;
 	sf::View playerView;
 	sf::View HUD;
 	sf::Text FPSText;
-	sf::Font font;
 	void initHUD();
 	void setView();
 	void calculateFPS();
 	void updateHUD();
 	void updatePlayerCam();
 	void updateAnimatedFlowers();
+	void updateAnimatedCoins();
 	void setDrawingBounds();
 	bool moveIsColliding(sf::FloatRect playerRect);
+	void interactObject(Object& object);
 };
 
 #endif

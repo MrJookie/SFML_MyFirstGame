@@ -18,10 +18,8 @@ int main()
 	//window.setMouseCursorVisible(false);
 	//window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(60);
-	window.setKeyRepeatEnabled(false);
 
 	Game game(screenDimension);
-	Player player;
 
 	while (window.isOpen())
 	{

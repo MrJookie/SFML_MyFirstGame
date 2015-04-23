@@ -201,6 +201,7 @@ bool Level::loadFromFile(std::string filename)
 				object.name = objectName;
 				object.type = objectType;
 				object.sprite = sprite;
+				object.isVisible = true;
 
 				sf::Rect <int> objectRect;
 				objectRect.top = y;

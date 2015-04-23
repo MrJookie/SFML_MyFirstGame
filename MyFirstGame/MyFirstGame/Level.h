@@ -14,8 +14,8 @@ public:
 	std::string type;
 	sf::Rect<int> rect;
 	std::map<std::string, std::string> properties;
-
 	sf::Sprite sprite;
+	bool isVisible;
 };
 
 class Layer

@@ -11,6 +11,8 @@ Game::Game(sf::Vector2f screenDimension)
 	camPosition.x = screenDimension.x / 2;
 	camPosition.y = screenDimension.y / 2;
 
+	updatePlayerCam();
+
 	initHUD();
 }
 
@@ -23,12 +25,13 @@ void Game::update()
 	setDrawingBounds();
 	calculateFPS();
 	updateAnimatedFlowers();
+	updateAnimatedCoins();
 	updateHUD();
+	updatePlayerHUD();
 }
 
 void Game::initHUD()
 {
-	font.loadFromFile("arial.ttf");
 	FPSText.setFont(font);
 	FPSText.setCharacterSize(30);
 }
@@ -50,14 +53,29 @@ void Game::calculateFPS()
 	}
 }
 
+void Game::interactObject(Object& object)
+{
+	std::cout << object.name << std::endl;
+
+	if (object.name == "elixir_hp")
+	{
+		object.isVisible = false;
+
+		setHP(getHP() + 30);
+	}
+}
+
 bool Game::moveIsColliding(sf::FloatRect playerRect)
 {
 	for (int i = 0; i < objects.size(); ++i)
 	{
-		if (playerRect.intersects(objects[i].sprite.getGlobalBounds()))
+		if (objects[i].isVisible)
 		{
-			std::cout << objects[i].name << std::endl;
-			return true;
+			if (playerRect.intersects(objects[i].sprite.getGlobalBounds()))
+			{
+				interactObject(objects[i]);
+				return true;
+			}
 		}
 	}
 
@@ -70,30 +88,30 @@ void Game::movePlayer(int moveDirection)
 	sf::FloatRect playerRect = pSprite.getGlobalBounds();
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-		playerRect.top -= 1;
+		playerRect.top -= pSpeed;
 		if (!moveIsColliding(playerRect) && pSprite.getPosition().y > 0)
-			pSprite.move(0, -1);
+			pSprite.move(0, -pSpeed);
 		source.y = moveDirection;
 		playerMoved = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-		playerRect.height += 1;
-		if (!moveIsColliding(playerRect) && pSprite.getPosition().y + 32 < getMapSizePixels().y)
-			pSprite.move(0, 1);
+		playerRect.height += pSpeed;
+		if (!moveIsColliding(playerRect) && pSprite.getPosition().y + pSize.y < getMapSizePixels().y)
+			pSprite.move(0, pSpeed);
 		source.y = moveDirection;
 		playerMoved = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-		playerRect.width += 1;
-		if (!moveIsColliding(playerRect) && pSprite.getPosition().x + 32 < getMapSizePixels().x)
-			pSprite.move(1, 0);
+		playerRect.width += pSpeed;
+		if (!moveIsColliding(playerRect) && pSprite.getPosition().x + pSize.x < getMapSizePixels().x)
+			pSprite.move(pSpeed, 0);
 		source.y = moveDirection;
 		playerMoved = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-		playerRect.left -= 1;
+		playerRect.left -= pSpeed;
 		if (!moveIsColliding(playerRect) && pSprite.getPosition().x > 0)
-			pSprite.move(-1, 0);
+			pSprite.move(-pSpeed, 0);
 		source.y = moveDirection;
 		playerMoved = true;
 	}
@@ -104,49 +122,51 @@ void Game::movePlayer(int moveDirection)
 		{
 			frameCounter = 0;
 			source.x++;
-			if (source.x * 32 >= static_cast<int> (pTexture.getSize().x))
+			if (source.x * pSize.x >= static_cast<int> (pTexture.getSize().x))
 				source.x = 0;
 		}
 
-		pSprite.setTextureRect(sf::IntRect(source.x * 32, source.y * 32, 32, 32));
+		pSprite.setTextureRect(sf::IntRect(source.x * pSize.x, source.y * pSize.y, pSize.x, pSize.y));
+
 		updatePlayerCam();
-		playerView.setCenter(camPosition);
 	}
 }
 
 void Game::updatePlayerCam()
 {
-	if (pSprite.getPosition().x + 32 > screenDimension.x / 2)
+	if (pSprite.getPosition().x + pSize.x > screenDimension.x / 2)
 	{
-		if (pSprite.getPosition().x + 32 + screenDimension.x / 2 < getMapSizePixels().x)
-			camPosition.x = pSprite.getPosition().x + 32;
+		if (pSprite.getPosition().x + pSize.x + screenDimension.x / 2 < getMapSizePixels().x)
+			camPosition.x = pSprite.getPosition().x + pSize.x;
 	}
 	else
 	{
 		camPosition.x = screenDimension.x / 2;
 	}
 
-	if (pSprite.getPosition().y + 32 > screenDimension.y / 2)
+	if (pSprite.getPosition().y + pSize.y > screenDimension.y / 2)
 	{
-		if (pSprite.getPosition().y + 32 + screenDimension.y / 2 < getMapSizePixels().y)
-			camPosition.y = pSprite.getPosition().y + 32;
+		if (pSprite.getPosition().y + pSize.y + screenDimension.y / 2 < getMapSizePixels().y)
+			camPosition.y = pSprite.getPosition().y + pSize.y;
 	}
 	else
 	{
 		camPosition.y = screenDimension.y / 2;
 	}
+
+	playerView.setCenter(camPosition);
 }
 
 void Game::updateAnimatedFlowers()
 {
-	if (flowerAnimationClock.getElapsedTime().asMilliseconds() >= 300)
+	if (flowersAnimationClock.getElapsedTime().asMilliseconds() >= 300)
 	{
-		flowerAnimationClock.restart().asMilliseconds();
-		currentFlowerTile++;
+		flowersAnimationClock.restart().asMilliseconds();
+		currentFlowersTile++;
 	}
 
-	if (currentFlowerTile < 60 || currentFlowerTile > 64)
-		currentFlowerTile = 60;
+	if (currentFlowersTile < 60 || currentFlowersTile > 64)
+		currentFlowersTile = 60;
 
 	for (int x = leftTileX; x <= rightTileX; ++x)
 	{
@@ -154,9 +174,27 @@ void Game::updateAnimatedFlowers()
 		{
 			if (x < getMapSizeTiles().x && y < getMapSizeTiles().y)
 			{
-				layers[1].tiles[x][y].setTextureRect(subRects[currentFlowerTile]);
+				layers[1].tiles[x][y].setTextureRect(subRects[currentFlowersTile]);
 			}
 		}
+	}
+}
+
+void Game::updateAnimatedCoins()
+{
+	if (coinsAnimationClock.getElapsedTime().asMilliseconds() >= 150)
+	{
+		coinsAnimationClock.restart().asMilliseconds();
+		currentCoinsTile++;
+	}
+
+	if (currentCoinsTile < 105 || currentCoinsTile > 108)
+		currentCoinsTile = 105;
+
+	for (int i = 0; i < objects.size(); ++i)
+	{
+		if (objects[i].isVisible && objects[i].name == "coin")
+			objects[i].sprite.setTextureRect(subRects[currentCoinsTile]);
 	}
 }
 
@@ -178,22 +216,22 @@ void Game::setMouseCoords(int x, int y)
 
 void Game::setDrawingBounds()
 {
-	int playerPosToTileX = static_cast<int> (pSprite.getPosition().x / 32);
-	int playerPosToTileY = static_cast<int> (pSprite.getPosition().y / 32);
+	int playerPosToTileX = static_cast<int> (pSprite.getPosition().x / getTileSize().x);
+	int playerPosToTileY = static_cast<int> (pSprite.getPosition().y / getTileSize().y);
 
-	leftTileX = playerPosToTileX - static_cast<int> (screenDimension.x / 32);
+	leftTileX = playerPosToTileX - static_cast<int> (screenDimension.x / getTileSize().x);
 	leftTileX = leftTileX < 0 ? 0 : leftTileX;
 	leftTileX = leftTileX > getMapSizeTiles().x ? getMapSizeTiles().x : leftTileX;
 
-	rightTileX = playerPosToTileX + static_cast<int> (screenDimension.x / 32);
+	rightTileX = playerPosToTileX + static_cast<int> (screenDimension.x / getTileSize().x);
 	rightTileX = rightTileX < 0 ? 0 : rightTileX;
 	rightTileX = rightTileX > getMapSizeTiles().x ? getMapSizeTiles().x : rightTileX;
 
-	topTileY = playerPosToTileY - static_cast<int> (screenDimension.y / 32);
+	topTileY = playerPosToTileY - static_cast<int> (screenDimension.y / getTileSize().y);
 	topTileY = topTileY < 0 ? 0 : topTileY;
 	topTileY = topTileY > getMapSizeTiles().y ? getMapSizeTiles().y : topTileY;
 
-	bottomTileY = playerPosToTileY + static_cast<int> (screenDimension.y / 32);
+	bottomTileY = playerPosToTileY + static_cast<int> (screenDimension.y / getTileSize().y);
 	bottomTileY = bottomTileY < 0 ? 0 : bottomTileY;
 	bottomTileY = bottomTileY > getMapSizeTiles().y ? getMapSizeTiles().y : bottomTileY;
 }
@@ -204,7 +242,8 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	target.setView(playerView);
 
-	for (int layer = 0; layer < layers.size(); ++layer)
+	//draw map, flowers
+	for (int layer = 0; layer < 2; ++layer)
 	{
 		for (int x = leftTileX; x <= rightTileX; ++x)
 		{
@@ -216,12 +255,33 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		}
 	}
 
+	//draw objects
 	for (int i = 0; i < objects.size(); ++i)
 	{
-		target.draw(objects[i].sprite, states);
+		if (objects[i].isVisible)
+			target.draw(objects[i].sprite, states);
 	}
 
+	//draw player
 	target.draw(pSprite, states);
+
+	//draw trees, so player can go behind the trees
+	for (int layer = 2; layer < 3; ++layer)
+	{
+		for (int x = leftTileX; x <= rightTileX; ++x)
+		{
+			for (int y = topTileY; y <= bottomTileY; ++y)
+			{
+				if (x < getMapSizeTiles().x && y < getMapSizeTiles().y)
+					target.draw(layers[layer].tiles[x][y], states);
+			}
+		}
+	}
+
+	//draw playerHUD
+	target.draw(hpBarOutline, states);
+	target.draw(hpBarFill, states);
+	target.draw(pLevelHUD);
 
 	target.setView(HUD);
 	target.draw(FPSText);
