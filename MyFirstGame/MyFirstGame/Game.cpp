@@ -1,4 +1,10 @@
+#include <iostream>
+#include <SFML/Graphics.hpp>
 #include "Game.h"
+
+Game::Game()
+{
+}
 
 Game::Game(sf::Vector2f screenDimension)
 {
@@ -8,32 +14,49 @@ Game::Game(sf::Vector2f screenDimension)
 	playerView.setSize(screenDimension.x, screenDimension.y);
 	playerView.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
-	camPosition.x = screenDimension.x / 2;
-	camPosition.y = screenDimension.y / 2;
+	font.loadFromFile("arial.ttf");
+	pTexture.loadFromFile("player.png");
+	pSprite.setTexture(pTexture);
+	pSprite.setPosition(400, 250);
 
-	updatePlayerCam();
+	pSize.x = 32;
+	pSize.y = 32;
 
-	initHUD();
+	source.x = 1;
+	source.y = 0;
+
+	frameCounter = 0;
+	switchFrame = 120;
+	frameSpeed = 700;
+
+	pSprite.setTextureRect(sf::IntRect(source.x * pSize.x, source.y * pSize.y, pSize.x, pSize.y));
+
+	setLevel(17);
+	setHP(30);
+	setSpeed(2.0);
+
+	HUD = sf::View(sf::FloatRect(0, 0, screenDimension.x, screenDimension.y));
+
+	initPlayerHUD();
 }
 
 Game::~Game()
 {
 }
 
-void Game::update()
+void Game::setSubRects(std::vector<sf::Rect<int>>& subRects)
 {
-	setDrawingBounds();
-	calculateFPS();
-	updateAnimatedFlowers();
-	updateAnimatedCoins();
-	updateHUD();
-	updatePlayerHUD();
+	this->subRects = subRects;
 }
 
-void Game::initHUD()
+void Game::setObjects(std::vector<Object>& objects)
 {
-	FPSText.setFont(font);
-	FPSText.setCharacterSize(30);
+	this->objects = objects;
+}
+
+void Game::setLayers(std::vector<Layer>& layers)
+{
+	this->layers = layers;
 }
 
 void Game::updateHUD()
@@ -49,8 +72,97 @@ void Game::calculateFPS()
 	if (updateFpsClock.getElapsedTime().asSeconds() >= 1)
 	{
 		updateFpsClock.restart().asSeconds();
-		FPS = static_cast<int> (1.0f / time.asSeconds());
+		FPS = static_cast<int>(1.0f / time.asSeconds());
 	}
+}
+
+void Game::initPlayerHUD()
+{
+	FPSText.setFont(font);
+	FPSText.setCharacterSize(30);
+
+	pLevelHUD.setFont(font);
+	pLevelHUD.setString("lvl." + std::to_string(getLevel()) + " 97%");
+	pLevelHUD.setCharacterSize(8);
+	pLevelHUD.setColor(sf::Color(0, 0, 0));
+
+	hpBarOutline.setSize(sf::Vector2f(static_cast<float>(pSize.x), 3));
+	hpBarOutline.setFillColor(sf::Color(0, 255, 0, 0));
+	hpBarOutline.setOutlineThickness(1);
+	hpBarOutline.setOutlineColor(sf::Color(0, 0, 0, 255));
+
+	hpBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x), 3));
+}
+
+void Game::update()
+{
+	setDrawingBounds();
+	calculateFPS();
+	updateAnimatedFlowers();
+	updateAnimatedCoins();
+	updateHUD();
+	updatePlayerHUD();
+	updatePlayerCam();
+}
+
+void Game::updatePlayerHUD()
+{
+	hpBarOutline.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
+	hpBarFill.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
+	pLevelHUD.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 20));
+	
+	if (pHP < 26) {
+		hpBarFill.setFillColor(sf::Color(180, 0, 0, 255));
+	}
+	else if (pHP < 51) {
+		hpBarFill.setFillColor(sf::Color(255, 51, 0, 255));
+	}
+	else if (pHP < 76) {
+		hpBarFill.setFillColor(sf::Color(255, 204, 0, 255));
+	}
+	else if (pHP <= 100) {
+		hpBarFill.setFillColor(sf::Color(0, 255, 0, 255));
+	}
+
+	if (pHP >= 0 && pHP <= 100)
+		hpBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x * (pHP / 100.0f)), 3));
+	else
+		hpBarFill.setSize(sf::Vector2f(0, 3));
+}
+
+void Game::setHP(int hp)
+{
+	pHP = hp;
+
+	if (pHP < 0)
+		pHP = 0;
+	else if (pHP > 100)
+		pHP = 100;
+}
+
+int Game::getHP()
+{
+	return pHP;
+}
+
+void Game::setSpeed(float speed)
+{
+	pSpeed = speed;
+}
+
+float Game::getSpeed()
+{
+	return pSpeed;
+}
+
+void Game::setLevel(int level)
+{
+	pLevel = level;
+}
+
+int Game::getLevel()
+{
+	return pLevel;
 }
 
 void Game::interactObject(Object& object)
@@ -65,7 +177,7 @@ void Game::interactObject(Object& object)
 	}
 }
 
-bool Game::moveIsColliding(sf::FloatRect playerRect)
+bool Game::moveIsColliding(sf::FloatRect& playerRect)
 {
 	for (int i = 0; i < objects.size(); ++i)
 	{
@@ -96,14 +208,14 @@ void Game::movePlayer(int moveDirection)
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 		playerRect.height += pSpeed;
-		if (!moveIsColliding(playerRect) && pSprite.getPosition().y + pSize.y < getMapSizePixels().y)
+		if (!moveIsColliding(playerRect) && pSprite.getPosition().y + pSize.y < mapSizePixels.y)
 			pSprite.move(0, pSpeed);
 		source.y = moveDirection;
 		playerMoved = true;
 	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
 		playerRect.width += pSpeed;
-		if (!moveIsColliding(playerRect) && pSprite.getPosition().x + pSize.x < getMapSizePixels().x)
+		if (!moveIsColliding(playerRect) && pSprite.getPosition().x + pSize.x < mapSizePixels.x)
 			pSprite.move(pSpeed, 0);
 		source.y = moveDirection;
 		playerMoved = true;
@@ -122,13 +234,11 @@ void Game::movePlayer(int moveDirection)
 		{
 			frameCounter = 0;
 			source.x++;
-			if (source.x * pSize.x >= static_cast<int> (pTexture.getSize().x))
+			if (source.x * pSize.x >= static_cast<int>(pTexture.getSize().x))
 				source.x = 0;
 		}
 
 		pSprite.setTextureRect(sf::IntRect(source.x * pSize.x, source.y * pSize.y, pSize.x, pSize.y));
-
-		updatePlayerCam();
 	}
 }
 
@@ -136,7 +246,7 @@ void Game::updatePlayerCam()
 {
 	if (pSprite.getPosition().x + pSize.x > screenDimension.x / 2)
 	{
-		if (pSprite.getPosition().x + pSize.x + screenDimension.x / 2 < getMapSizePixels().x)
+		if (pSprite.getPosition().x + pSize.x + screenDimension.x / 2 < mapSizePixels.x)
 			camPosition.x = pSprite.getPosition().x + pSize.x;
 	}
 	else
@@ -146,7 +256,7 @@ void Game::updatePlayerCam()
 
 	if (pSprite.getPosition().y + pSize.y > screenDimension.y / 2)
 	{
-		if (pSprite.getPosition().y + pSize.y + screenDimension.y / 2 < getMapSizePixels().y)
+		if (pSprite.getPosition().y + pSize.y + screenDimension.y / 2 < mapSizePixels.y)
 			camPosition.y = pSprite.getPosition().y + pSize.y;
 	}
 	else
@@ -172,7 +282,7 @@ void Game::updateAnimatedFlowers()
 	{
 		for (int y = topTileY; y <= bottomTileY; ++y)
 		{
-			if (x < getMapSizeTiles().x && y < getMapSizeTiles().y)
+			if (x < mapSizeTiles.x && y < mapSizeTiles.y)
 			{
 				layers[1].tiles[x][y].setTextureRect(subRects[currentFlowersTile]);
 			}
@@ -198,6 +308,19 @@ void Game::updateAnimatedCoins()
 	}
 }
 
+void Game::onMouseWheelMoved(sf::Event event)
+{
+	/*
+	int delta = event.mouseWheel.delta;
+	sf::Vector2i pos(event.mouseWheel.x, event.mouseWheel.y);
+
+	if (delta > 0)
+		playerView.zoom(1.2f);
+	else if (delta < 0)
+		playerView.zoom(1.0f);
+	*/
+}
+
 sf::Vector2f Game::getScreenDimension()
 {
 	return screenDimension;
@@ -216,24 +339,24 @@ void Game::setMouseCoords(int x, int y)
 
 void Game::setDrawingBounds()
 {
-	int playerPosToTileX = static_cast<int> (pSprite.getPosition().x / getTileSize().x);
-	int playerPosToTileY = static_cast<int> (pSprite.getPosition().y / getTileSize().y);
+	int playerPosToTileX = static_cast<int>(pSprite.getPosition().x / tileSize.x);
+	int playerPosToTileY = static_cast<int>(pSprite.getPosition().y / tileSize.y);
 
-	leftTileX = playerPosToTileX - static_cast<int> (screenDimension.x / getTileSize().x);
+	leftTileX = playerPosToTileX - static_cast<int>(screenDimension.x / tileSize.x);
 	leftTileX = leftTileX < 0 ? 0 : leftTileX;
-	leftTileX = leftTileX > getMapSizeTiles().x ? getMapSizeTiles().x : leftTileX;
+	leftTileX = leftTileX > mapSizeTiles.x ? mapSizeTiles.x : leftTileX;
 
-	rightTileX = playerPosToTileX + static_cast<int> (screenDimension.x / getTileSize().x);
+	rightTileX = playerPosToTileX + static_cast<int>(screenDimension.x / tileSize.x);
 	rightTileX = rightTileX < 0 ? 0 : rightTileX;
-	rightTileX = rightTileX > getMapSizeTiles().x ? getMapSizeTiles().x : rightTileX;
+	rightTileX = rightTileX > mapSizeTiles.x ? mapSizeTiles.x : rightTileX;
 
-	topTileY = playerPosToTileY - static_cast<int> (screenDimension.y / getTileSize().y);
+	topTileY = playerPosToTileY - static_cast<int>(screenDimension.y / tileSize.y);
 	topTileY = topTileY < 0 ? 0 : topTileY;
-	topTileY = topTileY > getMapSizeTiles().y ? getMapSizeTiles().y : topTileY;
+	topTileY = topTileY > mapSizeTiles.y ? mapSizeTiles.y : topTileY;
 
-	bottomTileY = playerPosToTileY + static_cast<int> (screenDimension.y / getTileSize().y);
+	bottomTileY = playerPosToTileY + static_cast<int>(screenDimension.y / tileSize.y);
 	bottomTileY = bottomTileY < 0 ? 0 : bottomTileY;
-	bottomTileY = bottomTileY > getMapSizeTiles().y ? getMapSizeTiles().y : bottomTileY;
+	bottomTileY = bottomTileY > mapSizeTiles.y ? mapSizeTiles.y : bottomTileY;
 }
 
 //vector<Object*> Level::getObjectsAt(float x, float y) {
@@ -249,7 +372,7 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		{
 			for (int y = topTileY; y <= bottomTileY; ++y)
 			{
-				if (x < getMapSizeTiles().x && y < getMapSizeTiles().y)
+				if (x < mapSizeTiles.x && y < mapSizeTiles.y)
 					target.draw(layers[layer].tiles[x][y], states);
 			}
 		}
@@ -272,7 +395,7 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		{
 			for (int y = topTileY; y <= bottomTileY; ++y)
 			{
-				if (x < getMapSizeTiles().x && y < getMapSizeTiles().y)
+				if (x < mapSizeTiles.x && y < mapSizeTiles.y)
 					target.draw(layers[layer].tiles[x][y], states);
 			}
 		}
@@ -285,4 +408,19 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 	target.setView(HUD);
 	target.draw(FPSText);
+}
+
+void Game::setMapSizeTiles(sf::Vector2i mapSizeTiles)
+{
+	this->mapSizeTiles = mapSizeTiles;
+}
+
+void Game::setMapSizePixels(sf::Vector2i mapSizePixels)
+{
+	this->mapSizePixels = mapSizePixels;
+}
+
+void Game::setTileSize(sf::Vector2i tileSize)
+{
+	this->tileSize = tileSize;
 }

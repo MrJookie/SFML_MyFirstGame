@@ -1,7 +1,9 @@
+#include <iostream>
+#include <string>
+#include <vector>
 #include <SFML/Graphics.hpp>
+#include "TileMap.h"
 #include "Game.h"
-#include "Level.h"
-#include "Player.h"
 
 int main()
 {
@@ -19,7 +21,34 @@ int main()
 	//window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(60);
 
+	sf::Clock frameClock;
+
+	TileMap level;
+	TileMap level2;
 	Game game(screenDimension);
+
+	try {
+		level.loadFromFile("map.tmx");
+		level2.loadFromFile("map2.tmx");
+	}
+	catch (std::string err) {
+		std::cout << err << std::endl;
+		return 1;
+	}
+
+	//level = level2;
+
+	game.setSubRects(level.getSubRects());
+	game.setObjects(level.getObjects());
+	game.setLayers(level.getLayers());
+
+	game.setMapSizeTiles(level.getMapSizeTiles());
+	game.setMapSizePixels(level.getMapSizePixels());
+	game.setTileSize(level.getTileSize());
+
+	std::cout << "Map width: " << level.getMapSizeTiles().x << std::endl;
+	std::cout << "Map height: " << level.getMapSizeTiles().y << std::endl;
+	std::cout << "Objects loaded: " << level.getObjects().size() << std::endl;
 
 	while (window.isOpen())
 	{
@@ -28,9 +57,11 @@ int main()
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 				window.close();
-			if (event.type == sf::Event::MouseMoved)
+			else if (event.type == sf::Event::MouseWheelMoved)
+				game.onMouseWheelMoved(event);
+			else if (event.type == sf::Event::MouseMoved)
 			{
 				game.setMouseCoords(event.mouseMove.x, event.mouseMove.y);
 			}
@@ -49,11 +80,15 @@ int main()
 			game.movePlayer(1);
 		}
 
+		frameClock.restart().asSeconds();
+
 		game.update();
 
 		window.clear();
 		window.draw(game);
 		window.display();
+
+		window.setTitle("MyFirstGame " + std::to_string(1.f / frameClock.getElapsedTime().asSeconds()));
 	}
 
 	return 0;
