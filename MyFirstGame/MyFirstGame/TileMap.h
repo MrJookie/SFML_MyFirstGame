@@ -1,11 +1,5 @@
-#ifndef LEVEL_H
-#define LEVEL_H
-
-#include <fstream>
-#include <string>
-#include <vector>
-#include <SFML/Graphics.hpp>
-#include "RapidXML/rapidxml.hpp"
+#ifndef TILEMAP_H
+#define TILEMAP_H
 
 class Object
 {
@@ -34,10 +28,10 @@ public:
 	~TileMap();
 
 	bool loadFromFile(std::string fileName);
-	std::vector<sf::Rect<int>> getSubRects();
+	std::vector<sf::Rect<int>>& getSubRects();
 	std::vector<Object> getObjects(std::string name);
-	std::vector<Object> getObjects();
-	std::vector<Layer> getLayers();
+	std::vector<Object>& getObjects();
+	std::vector<Layer>& getLayers();
 	sf::Vector2i getMapSizeTiles() const;
 	sf::Vector2i getMapSizePixels();
 	sf::Vector2i getTileSize() const;

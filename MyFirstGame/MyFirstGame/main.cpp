@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "TileMap.h"
 #include "Game.h"
 
@@ -19,6 +20,7 @@ int main()
 
 	//window.setMouseCursorVisible(false);
 	//window.setVerticalSyncEnabled(true);
+	window.setKeyRepeatEnabled(false);
 	window.setFramerateLimit(60);
 
 	sf::Clock frameClock;
@@ -31,8 +33,8 @@ int main()
 		level.loadFromFile("map.tmx");
 		level2.loadFromFile("map2.tmx");
 	}
-	catch (std::string err) {
-		std::cout << err << std::endl;
+	catch (std::string e) {
+		std::cout << e << std::endl;
 		return 1;
 	}
 
@@ -59,11 +61,39 @@ int main()
 				window.close();
 			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 				window.close();
-			else if (event.type == sf::Event::MouseWheelMoved)
+			
+			if (event.type == sf::Event::MouseWheelMoved)
 				game.onMouseWheelMoved(event);
-			else if (event.type == sf::Event::MouseMoved)
+			
+			if (event.type == sf::Event::MouseMoved)
 			{
 				game.setMouseCoords(event.mouseMove.x, event.mouseMove.y);
+			}
+
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::I)
+			{
+				game.toggleInventory();
+			}
+
+			if (event.type == sf::Event::MouseButtonPressed)
+			{
+				if (event.mouseButton.button == sf::Mouse::Left)
+				{
+					game.selectItem(window, sf::Mouse::getPosition(window));
+					game.toggleMusic();
+				}
+				else if (event.mouseButton.button == sf::Mouse::Right)
+				{
+					game.removeInventoryItem();
+				}
+			}
+
+			if (event.type == sf::Event::MouseMoved && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+			{
+				game.recalculateHighlightBox(window, sf::Mouse::getPosition(window));
+			}
+			else {
+				game.recalculateHighlightBox(sf::Mouse::getPosition(window));
 			}
 		}
 
@@ -87,6 +117,8 @@ int main()
 		window.clear();
 		window.draw(game);
 		window.display();
+
+		//game.playMusic();
 
 		window.setTitle("MyFirstGame " + std::to_string(1.f / frameClock.getElapsedTime().asSeconds()));
 	}

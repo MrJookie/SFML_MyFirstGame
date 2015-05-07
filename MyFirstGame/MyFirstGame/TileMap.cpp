@@ -1,3 +1,8 @@
+#include <fstream>
+#include <string>
+#include <vector>
+#include <SFML/Graphics.hpp>
+#include "RapidXML/rapidxml.hpp"
 #include "TileMap.h"
 
 using namespace rapidxml;
@@ -8,6 +13,20 @@ TileMap::TileMap()
 
 TileMap::~TileMap()
 {
+}
+
+TileMap::TileMap(TileMap& value)
+{
+	tilesetImage = value.tilesetImage;
+
+	objects = value.objects;
+	layers = value.layers;
+	subRects = value.subRects;
+
+	tileWidth = value.tileWidth;
+	tileHeight = value.tileHeight;
+
+	firstTileID = value.firstTileID;
 }
 
 TileMap& TileMap::operator=(TileMap& value)
@@ -123,13 +142,13 @@ bool TileMap::loadFromFile(std::string fileName)
 		while (tileElement)
 		{
 			int tileGID = atoi(tileElement->first_attribute("gid")->value());
-			int subRectToUse = tileGID - firstTileID;
+			int GIDsubRect = tileGID - firstTileID;
 
-			if (subRectToUse >= 0)
+			if (GIDsubRect >= 0)
 			{
 				sf::Sprite sprite;
 				sprite.setTexture(tilesetImage);
-				sprite.setTextureRect(subRects[subRectToUse]);
+				sprite.setTextureRect(subRects[GIDsubRect]);
 				sprite.setPosition(x * tileWidth, y * tileHeight);
 				sprite.setColor(sf::Color(255, 255, 255, layer.opacity));
 
@@ -261,17 +280,17 @@ std::vector<Object> TileMap::getObjects(std::string name)
 	return vec;
 }
 
-std::vector<sf::Rect<int>> TileMap::getSubRects()
+std::vector<sf::Rect<int>>& TileMap::getSubRects()
 {
 	return subRects;
 }
 
-std::vector<Object> TileMap::getObjects()
+std::vector<Object>& TileMap::getObjects()
 {
 	return objects;
 }
 
-std::vector<Layer> TileMap::getLayers()
+std::vector<Layer>& TileMap::getLayers()
 {
 	return layers;
 }
