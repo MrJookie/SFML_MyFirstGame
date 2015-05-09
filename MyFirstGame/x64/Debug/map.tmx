@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="128" height="128" tilewidth="32" tileheight="32" nextobjectid="2381">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="128" height="128" tilewidth="32" tileheight="32" nextobjectid="2394">
  <tileset firstgid="1" name="tilesheet" tilewidth="32" tileheight="32">
   <image source="tilesheet.png" width="320" height="576"/>
   <terraintypes>
@@ -49297,5 +49297,15 @@
   <object id="2378" name="elixir_hp" gid="50" x="255" y="516"/>
   <object id="2379" name="chest" gid="51" x="466" y="463"/>
   <object id="2380" name="chest" gid="51" x="619" y="247"/>
+  <object id="2381" name="apple" gid="70" x="549" y="556"/>
+  <object id="2382" name="apple" gid="70" x="462" y="148"/>
+  <object id="2383" name="elixir_mana" gid="80" x="56" y="263"/>
+  <object id="2384" name="elixir_mana" gid="80" x="545" y="468"/>
+  <object id="2385" name="elixir_mana" gid="80" x="226" y="690"/>
+  <object id="2387" name="tree" x="835" y="515" width="58" height="30"/>
+  <object id="2388" name="fence" x="671" y="546" width="222" height="30"/>
+  <object id="2391" name="tree" x="642" y="771" width="58" height="30"/>
+  <object id="2392" name="tree" x="802" y="739" width="58" height="30"/>
+  <object id="2393" name="tree" x="738" y="835" width="58" height="30"/>
  </objectgroup>
 </map>

@@ -1,18 +1,20 @@
-﻿Build started 2. 5. 2015 2:38:33.
+﻿Build started 9. 5. 2015 18:51:40.
      1>Project "C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\MyFirstGame\MyFirstGame.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\includes /Zi /nologo /W3 /WX- /O2 /Oi /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt TileMap.cpp main.cpp Game.cpp
-         TileMap.cpp
-     1>TileMap.cpp(79): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
-     1>TileMap.cpp(117): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>TileMap.cpp(168): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>TileMap.cpp(169): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
-     1>TileMap.cpp(199): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-     1>TileMap.cpp(200): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
-         main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /IC:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\includes /Zi /nologo /W3 /WX- /O2 /Oi /GL /D SFML_STATIC /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"x64\Release\\" /Fd"x64\Release\vc120.pdb" /Gd /TP /errorReport:prompt Game.cpp
          Game.cpp
+     1>Game.cpp(24): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Game.cpp(25): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Game.cpp(210): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>Game.cpp(318): warning C4244: '=' : conversion from 'float' to 'int', possible loss of data
+     1>Game.cpp(323): warning C4244: 'return' : conversion from 'int' to 'float', possible loss of data
+     1>Game.cpp(504): warning C4244: '=' : conversion from 'const float' to 'int', possible loss of data
+     1>Game.cpp(505): warning C4244: '=' : conversion from 'const float' to 'int', possible loss of data
+     1>Game.cpp(527): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>Game.cpp(748): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>Game.cpp(749): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\libs "sfml-graphics.lib" "sfml-window.lib" "sfml-system.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.lib" /MACHINE:X64 x64\Release\TileMap.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\libs "sfml-window-s.lib" "sfml-graphics-s.lib" "sfml-system-s.lib" "sfml-audio-s.lib" glew.lib freetype.lib winmm.lib jpeg.lib opengl32.lib sndfile.lib openal32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\admin\Documents\GitHub\SFML_MyFirstGame\MyFirstGame\x64\Release\MyFirstGame.lib" /MACHINE:X64 x64\Release\TileMap.obj
          x64\Release\main.obj
          x64\Release\Game.obj
          Generating code
@@ -22,4 +24,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:11.93
+Time Elapsed 00:00:05.69

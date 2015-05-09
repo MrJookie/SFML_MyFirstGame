@@ -43,11 +43,11 @@ private:
 	sf::Vector2i mapSizeTiles;
 	sf::Vector2i mapSizePixels;
 	sf::Vector2i tileSize;
-	//std::vector<Object> inventoryItems;
 	int leftTileX, rightTileX, topTileY, bottomTileY;
 	int FPS;
 	int currentFlowersTile, currentCoinsTile;
 	int pHP;
+	int pMana;
 	int pLevel;
 	int pLevelExp;
 	int pSpeed;
@@ -70,6 +70,7 @@ private:
 	sf::Vector2f mousePosition;
 	sf::View playerView;
 	sf::View HUD;
+	sf::View minimapView;
 	sf::Font font;
 	sf::Text pLevelHUD;
 	sf::Text FPSText;
@@ -84,6 +85,10 @@ private:
 	sf::Clock playerAnimationClock;
 	sf::RectangleShape hpBarOutline;
 	sf::RectangleShape hpBarFill;
+	sf::RectangleShape manaBarOutline;
+	sf::RectangleShape manaBarFill;
+	sf::RectangleShape minimapOutline;
+	sf::RectangleShape minimapFill;
 	sf::Texture inventoryTex;
 	sf::Sprite inventory;
 	sf::Vector2i selectionStartPosition;
@@ -105,13 +110,19 @@ private:
 	bool useInventoryItem(std::string objectName);
 	void interactObject(Object& object);
 	void setHP(int hp);
+	void setMana(int mana);
 	void setSpeed(float speed);
 	void setLevel(int level);
 	void setLevelExp(int exp);
 	int getHP();
+	int getMana();
 	float getSpeed();
 	int getLevel();
 	int getLevelExp();
+	void loadShaders();
+	sf::Shader transparencyShader;
+	sf::RenderStates minimapTransparentState;
+	std::string fragmentShaderTransparency;
 };
 
 #endif

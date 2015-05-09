@@ -15,6 +15,12 @@ Game::Game(sf::Vector2f screenDimension)
 	playerView.setSize(screenDimension.x, screenDimension.y);
 	playerView.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
 
+	minimapView.setCenter(screenDimension.x / 2, screenDimension.y / 2);
+	minimapView.setSize(screenDimension.x, screenDimension.y);
+	minimapView.setViewport(sf::FloatRect(0.74f, 0.01f, 0.25f, 0.25f));
+	minimapOutline.setPosition(sf::Vector2f(minimapView.getSize().x * 0.74f, minimapView.getSize().y * 0.01f));
+	minimapFill.setPosition(sf::Vector2f(minimapView.getSize().x * 0.74f, minimapView.getSize().y * 0.01f));
+
 	selectionStartPosition.x = mousePosition.x;
 	selectionStartPosition.y = mousePosition.y;
 
@@ -48,6 +54,7 @@ Game::Game(sf::Vector2f screenDimension)
 	setLevel(1);
 	setLevelExp(0);
 	setHP(30);
+	setMana(60);
 	setSpeed(100);
 
 	itemIsSelected = false;
@@ -58,6 +65,8 @@ Game::Game(sf::Vector2f screenDimension)
 	HUD = sf::View(sf::FloatRect(0, 0, screenDimension.x, screenDimension.y));
 
 	initHUD();
+
+	loadShaders();
 }
 
 Game::~Game()
@@ -103,8 +112,20 @@ void Game::initHUD()
 	hpBarOutline.setFillColor(sf::Color(0, 255, 0, 0));
 	hpBarOutline.setOutlineThickness(1);
 	hpBarOutline.setOutlineColor(sf::Color(0, 0, 0, 255));
-
 	hpBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x), 3));
+
+	manaBarOutline.setSize(sf::Vector2f(static_cast<float>(pSize.x), 3));
+	manaBarOutline.setFillColor(sf::Color(0, 0, 255, 0));
+	manaBarOutline.setOutlineThickness(1);
+	manaBarOutline.setOutlineColor(sf::Color(0, 0, 0, 255));
+	manaBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x), 3));
+
+	minimapOutline.setSize(sf::Vector2f(minimapView.getSize().x * 0.25f, minimapView.getSize().y * 0.25f));
+	minimapOutline.setFillColor(sf::Color(0, 255, 0, 0));
+	minimapOutline.setOutlineThickness(2);
+	minimapOutline.setOutlineColor(sf::Color(0, 0, 0, 255));
+	minimapFill.setSize(sf::Vector2f(minimapView.getSize().x * 0.25f, minimapView.getSize().y * 0.25f));
+	minimapFill.setFillColor(sf::Color(255, 255, 255, 60));
 
 	inventoryTex.loadFromFile("inventory.png");
 	inventory.setTexture(inventoryTex);
@@ -114,7 +135,7 @@ void Game::initHUD()
 	textureSpeakerOff.loadFromFile("speakerOff.png");
 	speaker.setTexture(textureSpeakerOn);
 
-	speaker.setPosition(screenDimension.x - 20, 10);
+	speaker.setPosition(5, 40);
 
 	highlightBox.setFillColor(sf::Color(255, 255, 255, 60));
 	highlightBox.setOutlineThickness(1.0);
@@ -228,27 +249,36 @@ void Game::updateHUD()
 	if (FPS > 0)
 		FPSText.setString(std::to_string(FPS));
 
-	hpBarOutline.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
-	hpBarFill.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
-	pLevelHUD.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 20));
+	hpBarOutline.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 14));
+	hpBarFill.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 14));
+	manaBarOutline.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
+	manaBarFill.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 8));
+	manaBarFill.setFillColor(sf::Color(0, 0, 255, 255));
+
+	pLevelHUD.setPosition(sf::Vector2f(pSprite.getPosition().x, pSprite.getPosition().y - 26));
 	
-	if (pHP < 26) {
+	if (getHP() < 26) {
 		hpBarFill.setFillColor(sf::Color(180, 0, 0, 255));
 	}
-	else if (pHP < 51) {
+	else if (getHP() < 51) {
 		hpBarFill.setFillColor(sf::Color(255, 51, 0, 255));
 	}
-	else if (pHP < 76) {
+	else if (getHP() < 76) {
 		hpBarFill.setFillColor(sf::Color(255, 204, 0, 255));
 	}
-	else if (pHP <= 100) {
+	else if (getHP() <= 100) {
 		hpBarFill.setFillColor(sf::Color(0, 255, 0, 255));
 	}
 
-	if (pHP >= 0 && pHP <= 100)
-		hpBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x * (pHP / 100.0f)), 3));
+	if (getHP() >= 0 && getHP() <= 100)
+		hpBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x * (getHP() / 100.0f)), 3));
 	else
 		hpBarFill.setSize(sf::Vector2f(0, 3));
+
+	if (getMana() >= 0 && getMana() <= 100)
+		manaBarFill.setSize(sf::Vector2f(static_cast<float>(pSize.x * (getMana() / 100.0f)), 3));
+	else
+		manaBarFill.setSize(sf::Vector2f(0, 3));
 
 	pLevelHUD.setString("L" + std::to_string(getLevel()) + " " + std::to_string(getLevelExp()) + "%");
 }
@@ -257,15 +287,30 @@ void Game::setHP(int hp)
 {
 	pHP = hp;
 
-	if (pHP < 0)
+	if (getHP() < 0)
 		pHP = 0;
-	else if (pHP > 100)
+	else if (getHP() > 100)
 		pHP = 100;
 }
 
 int Game::getHP()
 {
 	return pHP;
+}
+
+void Game::setMana(int mana)
+{
+	pMana = mana;
+
+	if (pMana < 0)
+		pMana = 0;
+	else if (pMana > 100)
+		pMana = 100;
+}
+
+int Game::getMana()
+{
+	return pMana;
 }
 
 void Game::setSpeed(float speed)
@@ -319,15 +364,53 @@ void Game::interactObject(Object& object)
 
 	if (object.name == "elixir_hp")
 	{
-		object.isVisible = false;
-		setHP(getHP() + 30);
-		printSumVisibleObjectsLeft(object);
-		pickItem.play();
+		if (getHP() != 100)
+		{
+			object.isVisible = false;
+			setHP(getHP() + 30);
+			printSumVisibleObjectsLeft(object);
+			setLevelExp(30);
+			pickItem.play();
+		}
+		else {
+			if (addToInventory(object))
+			{
+				object.isVisible = false;
+				printSumVisibleObjectsLeft(object);
+				pickItem.play();
+			}
+			else {
+				std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
+			}
+		}
+	} 
+	else if(object.name == "elixir_mana")
+	{
+		if (getMana() != 100)
+		{
+			object.isVisible = false;
+			setMana(getMana() + 70);
+			printSumVisibleObjectsLeft(object);
+			setLevelExp(30);
+			pickItem.play();
+		}
+		else {
+			if (addToInventory(object))
+			{
+				object.isVisible = false;
+				printSumVisibleObjectsLeft(object);
+				pickItem.play();
+			}
+			else {
+				std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
+			}
+		}
 	}
 	else if (object.name == "elixir_speed") {
 		object.isVisible = false;
 		setSpeed(getSpeed() + 20);
 		printSumVisibleObjectsLeft(object);
+		setLevelExp(30);
 		pickItem.play();
 	}
 	else if (object.name == "pokeball") {
@@ -339,7 +422,7 @@ void Game::interactObject(Object& object)
 			pickItem.play();
 		}
 		else {
-			std::cout << "Inventory is full!" << std::endl;
+			std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
 		}
 	}
 	else if (object.name == "coin") {
@@ -351,7 +434,7 @@ void Game::interactObject(Object& object)
 			pickItem.play();
 		}
 		else {
-			std::cout << "Inventory is full!" << std::endl;
+			std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
 		}
 	}
 	else if (object.name == "key") {
@@ -363,7 +446,7 @@ void Game::interactObject(Object& object)
 			pickItem.play();
 		}
 		else {
-			std::cout << "Inventory is full!" << std::endl;
+			std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
 		}
 	}
 	else if (object.name == "table1") {
@@ -375,7 +458,7 @@ void Game::interactObject(Object& object)
 			pickItem.play();
 		}
 		else {
-			std::cout << "Inventory is full!" << std::endl;
+			std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
 		}
 	}
 	else if (object.name == "chest") {
@@ -390,6 +473,27 @@ void Game::interactObject(Object& object)
 		}
 		else {
 			std::cout << "Missing key to open chest!" << std::endl;
+		}
+	} 
+	else if(object.name == "apple")
+	{
+		if (getHP() != 100)
+		{
+			object.isVisible = false;
+			setHP(getHP() + 100);
+			printSumVisibleObjectsLeft(object);
+			pickItem.play();
+		}
+		else {
+			if (addToInventory(object))
+			{
+				object.isVisible = false;
+				printSumVisibleObjectsLeft(object);
+				pickItem.play();
+			}
+			else {
+				std::cout << "Inventory is full! Click RMB to remove item from inventory." << std::endl;
+			}
 		}
 	}
 }
@@ -476,7 +580,7 @@ bool Game::removeInventoryItem()
 			inventorySlotUsed[i] = false;
 			inventoryItems[i].isVisible = false;
 
-			std::cout << "removing item: " <<  inventoryItems[i].name << std::endl;
+			std::cout << "Removing item: " <<  inventoryItems[i].name << std::endl;
 
 			return true;
 		}
@@ -573,6 +677,7 @@ void Game::updateCam()
 	}
 
 	playerView.setCenter(camPosition);
+	minimapView.setCenter(camPosition);
 }
 
 void Game::updateAnimatedFlowers()
@@ -711,6 +816,8 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	//draw playerHUD
 	target.draw(hpBarOutline, states);
 	target.draw(hpBarFill, states);
+	target.draw(manaBarOutline, states);
+	target.draw(manaBarFill, states);
 	target.draw(pLevelHUD);
 
 	if (itemIsSelected)
@@ -722,6 +829,8 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	target.draw(highlightBox);
 
 	target.draw(FPSText);
+	target.draw(minimapFill);
+	target.draw(minimapOutline);
 
 	target.draw(inventory);
 	for each (auto item in inventoryItems)
@@ -731,6 +840,45 @@ void Game::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	}
 
 	target.draw(speaker);
+
+	target.setView(minimapView);
+
+	//draw map, flowers
+	//use minimapTransparentState shader to make minimap transparent (decrease in FPS due to number of drawcalls!)
+	for (int layer = 0; layer < 2; ++layer)
+	{
+		for (int x = leftTileX; x <= rightTileX; ++x)
+		{
+			for (int y = topTileY; y <= bottomTileY; ++y)
+			{
+				if (x < mapSizeTiles.x && y < mapSizeTiles.y)
+					target.draw(layers[layer].tiles[x][y], states);
+			}
+		}
+	}
+
+	//draw objects
+	for (int i = 0; i < objects.size(); ++i)
+	{
+		if (objects[i].isVisible)
+			target.draw(objects[i].sprite, states);
+	}
+
+	//draw trees, so player can go behind the trees
+	for (int layer = 2; layer < 3; ++layer)
+	{
+		for (int x = leftTileX; x <= rightTileX; ++x)
+		{
+			for (int y = topTileY; y <= bottomTileY; ++y)
+			{
+				if (x < mapSizeTiles.x && y < mapSizeTiles.y)
+					target.draw(layers[layer].tiles[x][y], states);
+			}
+		}
+	}
+
+	//draw player
+	target.draw(pSprite, states);
 }
 
 void Game::setMapSizeTiles(sf::Vector2i mapSizeTiles)
@@ -746,4 +894,16 @@ void Game::setMapSizePixels(sf::Vector2i mapSizePixels)
 void Game::setTileSize(sf::Vector2i tileSize)
 {
 	this->tileSize = tileSize;
+}
+
+void Game::loadShaders()
+{
+	fragmentShaderTransparency =
+		"void main() {"
+		"	gl_FragColor = vec4(0,0,0,0.1);"
+		"}";
+
+	transparencyShader.loadFromMemory(fragmentShaderTransparency, sf::Shader::Fragment);
+
+	minimapTransparentState.shader = &transparencyShader;
 }

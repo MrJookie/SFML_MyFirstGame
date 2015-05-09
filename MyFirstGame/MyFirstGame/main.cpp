@@ -1,3 +1,5 @@
+//1524 LoC
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,7 +12,7 @@ int main()
 {
 	std::cout << "Level is loading" << std::endl;
 
-	sf::Vector2f screenDimension(800, 600);
+	sf::Vector2f screenDimension(1024, 600);
 
 	sf::RenderWindow window(
 		sf::VideoMode(static_cast<int>(screenDimension.x), static_cast<int>(screenDimension.y)),
@@ -19,7 +21,7 @@ int main()
 	);
 
 	//window.setMouseCursorVisible(false);
-	//window.setVerticalSyncEnabled(true);
+	window.setVerticalSyncEnabled(true);
 	window.setKeyRepeatEnabled(false);
 	window.setFramerateLimit(60);
 
@@ -118,7 +120,7 @@ int main()
 		window.draw(game);
 		window.display();
 
-		//game.playMusic();
+		game.playMusic();
 
 		window.setTitle("MyFirstGame " + std::to_string(1.f / frameClock.getElapsedTime().asSeconds()));
 	}
